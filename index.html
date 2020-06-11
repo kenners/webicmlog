@@ -45,8 +45,8 @@
         if (err) {
           return window.alert('Error fetching docs from db')
         }
-        context.procedures = result.rows
-      })
+        context.procedures = result.rows;
+      });
       
       // Blackmagic voodoo to create UUIDv4
       // https://stackoverflow.com/questions/105034/how-to-create-guid-uuid
