@@ -41,7 +41,7 @@
         }
       })
       
-      this.db.allDocs({include_docs: true}), function (err, result){
+      this.db.allDocs({include_docs: true}, function (err, result){
         if (err) {
           return window.alert('Error fetching docs from db')
         }
