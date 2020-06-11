@@ -12,7 +12,13 @@
   <body>
     <h1>Web ICM Logbook</h1>
     
-    <div id=#vue-app></div>
+    <div id="app">
+      <ol>
+        <li v-for="procedure in procedures">
+          {{ procedure.doc.title }}
+        </li>
+      </ol>
+    </div>
     
     <!-- PouchDB JS -->
     <script src="//cdn.jsdelivr.net/npm/pouchdb@7.1.1/dist/pouchdb.min.js"></script>
@@ -23,6 +29,45 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    
+    <script>
+      var app = new Vue ({
+        el: '#app',
+        data: {
+          db: new PouchDB('logbook'), // Instantiate new db
+          remoteCouch: false,
+          procedures: {}, // All procedures
+          currentProcedure: {},
+        }
+      })
+      
+      this.db.allDocs({include_docs: true}), function (err, result){
+        if (err) {
+          return window.alert('Error fetching docs from db')
+        }
+        context.procedures = result.rows
+      })
+      
+      // Blackmagic voodoo to create UUIDv4
+      // https://stackoverflow.com/questions/105034/how-to-create-guid-uuid
+      // https://gist.github.com/jed/982883
+      function uuidv4() {
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+      }
+      
+      function addProcedure(text) {
+        var procedure = {
+          title: text,
+        };
+        db.post(procedure, function callback(err, result) {
+          if (!err) {
+            console.log('Successfully logged a procedure!');
+          }
+        });
+      }
+    </script>
     
   </body>
 </html>
